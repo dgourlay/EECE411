@@ -3,10 +3,9 @@
 	Build file for EECE411 Assignment 02
 	</description>
   <!-- set global properties for this build -->
-  <property name="projName" location="EECE411-A2"/>
+  <property name="projName" value="EECE411-A2"/>
   <property name="src" location="src"/>
   <property name="build" location="build"/>
-  <property name="dist"  location="dist"/>
 
   <target name="init">
     <!-- Create the time stamp -->
@@ -21,19 +20,29 @@
     <javac srcdir="${src}" destdir="${build}"/>
   </target>
 
-  <target name="dist" depends="compile"
+  <target name="jar" depends="compile"
         description="generate the distribution" >
-    <!-- Create the distribution directory -->
-    <mkdir dir="${dist}/lib"/>
+    
+	<!-- Put everything in ${build} into the ${projName}-${DSTAMP}.jar file -->
+	<!-- <jar jarfile="${projName}-${DSTAMP}.jar" basedir="${build}"/>  -->
+	
+	
+	<jar destfile="${projName}.jar" basedir="${build}">
+		<manifest>
+			<attribute name="Main-Class" value="com.dgourlay.eece411.A2.Main"/>
+		</manifest>
+	</jar>
+	
+  </target>
 
-    <!-- Put everything in ${build} into the ${projName}-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/lib/${projName}-${DSTAMP}.jar" basedir="${build}"/>
+  <target name="run">
+        <java jar="${projName}.jar" fork="true"/>
   </target>
 
   <target name="clean"
         description="clean up" >
     <!-- Delete the ${build} and ${dist} directory trees -->
     <delete dir="${build}"/>
-    <delete dir="${dist}"/>
+	<delete file="${projName}.jar" />
   </target>
 </project>

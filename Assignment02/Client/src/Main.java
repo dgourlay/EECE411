@@ -1,4 +1,4 @@
-package com.matei.eece411.A2;
+package com.dgourlay.eece411.A2;
 
 public class Main {
     

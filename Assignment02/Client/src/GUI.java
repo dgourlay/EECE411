@@ -1,4 +1,4 @@
-package com.matei.eece411.A2;
+package com.dgourlay.eece412.A2;
 
 /* TextDemo.java requires no other files. */
 
