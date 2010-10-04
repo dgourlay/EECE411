@@ -38,8 +38,8 @@
 		</manifest>
 	</jar> 
    
-   <rmic classname="ServerImpl" classpath="${build}" base="."/>
-   <rmic classname="ClientImpl" classpath="${build}" base="."/>
+   <rmic classname="Server" classpath="${build}" base="."/>
+   <rmic classname="Client" classpath="${build}" base="."/>
     
   </target>
 
