@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jnlp codebase="file:/home/dgourlay/EECE411/Assignment02/NBproject/EECE411-A2/dist/" href="launch.jnlp" spec="1.0+">
+    <information>
+        <title>EECE411-A2</title>
+        <vendor>dgourlay</vendor>
+        <homepage href=""/>
+        <description>EECE411-A2</description>
+        <description kind="short">EECE411-A2</description>
+    </information>
+    <resources>
+<j2se version="1.5+"/>
+<jar eager="true" href="EECE411-A2.jar" main="true"/>
+    </resources>
+    <application-desc main-class="com.dgourlay.eece411.A2.ClientImpl">
+    </application-desc>
+</jnlp>

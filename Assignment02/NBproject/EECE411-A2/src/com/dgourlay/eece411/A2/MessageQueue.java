@@ -1,3 +1,5 @@
+package com.dgourlay.eece411.A2;
+
 import java.util.LinkedList;
 
 /* a synchronized queue */

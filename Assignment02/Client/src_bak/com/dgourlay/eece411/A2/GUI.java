@@ -1,3 +1,5 @@
+package com.dgourlay.eece411.A2;
+
 /* TextDemo.java requires no other files. */
 
 import java.awt.*;

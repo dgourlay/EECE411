@@ -12,6 +12,7 @@
     <tstamp/>
     <!-- Create the build directory structure used by compile -->
     <mkdir dir="${build}"/>
+    <mkdir dir="${build}"/>
 
   </target>
 
@@ -26,29 +27,25 @@
     
 	<!-- Put everything in ${build} into the ${projName}-${DSTAMP}.jar file -->
 	
-	<jar destfile="${projName}-client.jar" basedir="${build}">
+	<jar destfile="${projName}-client.jar" basedir="${build}" excludes="ServerImpl.*">
 		<manifest>
-			<attribute name="Main-Class" value="ClientImpl"/>
+			<attribute name="Main-Class" value="com.dgourlay.eece411.A2.ClientImpl"/>
 		</manifest>
     </jar>
    
+   <rmic classname="com.dgourlay.eece411.A2.ServerImpl" classpath="${build}" base="."/>
+   <rmic classname="com.dgourlay.eece411.A2.ClientImpl" classpath="${build}" base="."/>
+
    <jar destfile="${projName}-server.jar" basedir="${build}">
 		<manifest>
-			<attribute name="Main-Class" value="ServerImpl"/>
+			<attribute name="Main-Class" value="com.dgourlay.eece411.A2.ServerImpl"/>
 		</manifest>
 	</jar> 
-   
-   <rmic classname="ServerImpl" classpath="${build}" base="."/>
-   <rmic classname="ClientImpl" classpath="${build}" base="."/>
     
   </target>
 
-  <target name="run-server">
-        <java jar="${projName}-server.jar" fork="true"/>
-  </target>
-  
-  <target name="run-client">
-        <java jar="${projName}-client.jar" fork="true"/>
+  <target name="run">
+        <java jar="${projName}.jar" fork="true"/>
   </target>
 
   <target name="clean"
