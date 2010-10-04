@@ -1,7 +1,6 @@
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Scanner;
 
 public class ClientImpl extends UnicastRemoteObject implements Client, Runnable {
 
@@ -37,19 +36,19 @@ public class ClientImpl extends UnicastRemoteObject implements Client, Runnable 
         // calling the GUI method that updates the text area of the GUI
         // NOTE: you might want to call the same method when a new chat message
         //       arrives
-        gui.addToTextArea("LocalUser:> Sample of displaying remote maessage");
+        gui.addToTextArea("Welcome to the EECE411-A2 Chat Program!");
 
 
 
     }
 
     public synchronized void receive(String s) throws RemoteException {
-        System.out.println("Message: " + s);
+		System.out.println("Message Received: " + s);
+		gui.addToTextArea("RemoteUser:> " + s);
     }
 
-    public void run() {
-        Scanner in = new Scanner(System.in);
 
+    public void run() {
 
         // The code below serves as an example to show how the shares message
         // between the GUI and the main thread.
@@ -75,9 +74,11 @@ public class ClientImpl extends UnicastRemoteObject implements Client, Runnable 
 
             try {
 
-                // update the GUI with the message entered by the user
-                gui.addToTextArea("Me:> " + s);
-                srv.send_message(s);
+				// update the GUI with the message entered by the user
+				gui.addToTextArea("Me:> " + s);
+				srv.send_message(s, this);
+				System.out.println("Sending message to server: "+s);
+
 
             } catch (Exception e) {
                 System.out.println("System error!");
@@ -85,8 +86,6 @@ public class ClientImpl extends UnicastRemoteObject implements Client, Runnable 
             }
 
 
-            // print it to System.out (or send it to the RMI server)
-            System.out.println("User entered: " + s + " -- now sending it to chat server");
         } // end while loop 
 
     }

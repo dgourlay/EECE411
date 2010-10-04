@@ -19,6 +19,9 @@
         description="compile the source " >
     <!-- Compile the client java code from ${src} into ${build} -->
     <javac srcdir="${src}" destdir="${build}"/>
+   
+   	<rmic classname="ServerImpl" base="${build}"/>
+   	<rmic classname="ClientImpl" base="${build}"/>
   </target>
 
   <target name="jar" depends="compile"
@@ -37,10 +40,10 @@
 			<attribute name="Main-Class" value="ServerImpl"/>
 		</manifest>
 	</jar> 
-   
-   <rmic classname="Server" classpath="${build}" base="."/>
-   <rmic classname="Client" classpath="${build}" base="."/>
-    
+   <!--
+   <rmic classname="ServerImpl" classpath="${build}" base="."/>
+   <rmic classname="ClientImpl" classpath="${build}" base="."/>
+   --> 
   </target>
 
   <target name="run-server">

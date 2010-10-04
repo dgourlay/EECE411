@@ -13,5 +13,5 @@ public interface Server extends Remote {
 
     void register(Client c) throws RemoteException;
 
-    void send_message(String s) throws RemoteException;
+    void send_message(String s, Client c) throws RemoteException;
 }

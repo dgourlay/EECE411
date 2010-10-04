@@ -1,12 +1,15 @@
+
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 
-import java.rmi.Naming;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.LinkedList;
 
 /**
  *
@@ -15,6 +18,7 @@ import java.util.LinkedList;
 public class ServerImpl extends UnicastRemoteObject implements Server {
 
     private LinkedList<Client> clientList;
+
 
     public ServerImpl() throws RemoteException {
         clientList = new LinkedList<Client>();
@@ -25,10 +29,12 @@ public class ServerImpl extends UnicastRemoteObject implements Server {
         clientList.add(c);
     }
 
-    public synchronized void send_message(String s) throws RemoteException {
-        for (int i = 0; i < clientList.size(); i++) {
-            clientList.get(i).receive(s);
-        }
+    public synchronized void send_message(String msg, Client c) throws RemoteException {
+        for(Client cs : clientList){
+			if(!cs.equals(c) ){
+				cs.receive(msg);
+			}
+		}
     }
 
     public static void main(String[] args) {
