@@ -58,7 +58,7 @@ public class GUI extends JPanel implements ActionListener {
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    protected static GUI createAndShowGUI(MessageQueue q) {
+    protected static GUI createAndShowGUI(MessageQueue q, String title) {
 
         if (gui != null) {
             return gui;
@@ -67,7 +67,7 @@ public class GUI extends JPanel implements ActionListener {
         // initilaize the message queue
 
         //Create and set up the window.
-        JFrame frame = new JFrame("TextDemo");
+        JFrame frame = new JFrame(title);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create and set up the content pane.

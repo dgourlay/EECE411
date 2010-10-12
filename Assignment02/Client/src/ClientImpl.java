@@ -4,13 +4,28 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class ClientImpl extends UnicastRemoteObject implements Client, Runnable {
 
+	private static final long serialVersionUID = 1;
+
 	static GUI gui;
 	static MessageQueue _queue;
 	private Server srv;
 
-	public ClientImpl(Server srv) throws RemoteException {
-		this.srv = srv;
-		srv.register(this);
+	private String chat_name, client_name, addr;
+	private String cName;
+
+	private boolean connected;
+
+	public ClientImpl(String chat_name, String client_name, String addr)
+			throws RemoteException {
+
+		srv = null;
+		this.chat_name = chat_name;
+		this.client_name = client_name;
+		this.addr = addr;
+
+		cName = client_name;
+
+		connected = false;
 
 		// create a shared buffer where the GUI add the messages thet need to
 		// be sent out by the main thread. The main thread stays in a loop
@@ -23,14 +38,14 @@ public class ClientImpl extends UnicastRemoteObject implements Client, Runnable 
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
-				gui = GUI.createAndShowGUI(_queue);
+				gui = GUI.createAndShowGUI(_queue, cName + "'s Chat");
 			}
 		});
 
 		// hack make sure the GUI instantioation is completed by the GUI thread
 		// before the next call
 		while (gui == null) {
-			Thread.currentThread().yield();
+			Thread.yield();
 		}
 
 		// calling the GUI method that updates the text area of the GUI
@@ -38,11 +53,44 @@ public class ClientImpl extends UnicastRemoteObject implements Client, Runnable 
 		// arrives
 		gui.addToTextArea("Welcome to the EECE411-A2 Chat Program!");
 
+		// gui.addToTextArea("Trying to connect to server...");
+		// srv.register(this);
+		connect(chat_name, client_name, addr);
+
+	}
+
+	public void connect(String chat_name, String client_name, String addr) {
+
+		// String url = "rmi://localhost/Server";
+		String url = "rmi://" + addr + "/" + chat_name;
+		System.out.println("Connecting to: " + url);
+		try {
+			srv = (Server) Naming.lookup(url);
+			srv.register(this);
+		} catch (Exception e) {
+			System.out
+					.println("Client cannot register pointer back to self with server RMI");
+			e.printStackTrace();
+		}
+
+		gui.addToTextArea("Trying to register to server...");
+		while (!connected) {
+			try {
+				srv.register(this);
+			} catch (Exception e) {
+
+			}
+		}
+		gui.addToTextArea("Connected!");
+	}
+
+	public void setConnected(boolean value) throws RemoteException {
+		this.connected = value;
 	}
 
 	public synchronized void receive(String s) throws RemoteException {
 		System.out.println("Message Received: " + s);
-		gui.addToTextArea("RemoteUser:> " + s);
+		gui.addToTextArea(s);
 	}
 
 	public void run() {
@@ -75,14 +123,19 @@ public class ClientImpl extends UnicastRemoteObject implements Client, Runnable 
 
 			try {
 
-				// update the GUI with the message entered by the user
-				gui.addToTextArea("Me:> " + s);
-				srv.send_message(s, this);
-				System.out.println("Sending message to server: " + s);
+				if (connected) {
+					// update the GUI with the message entered by the user
+					gui.addToTextArea("Me:> " + s);
+					srv.send_message(client_name + ": " + s, this);
+					System.out.println("Sending message to server: " + s);
+				} else {
+					connect(chat_name, client_name, addr);
+				}
 
 			} catch (Exception e) {
 				System.out.println("System error!");
-				e.printStackTrace();
+				gui.addToTextArea("Error sending message to server, reconnecting.");
+				connect(chat_name, client_name, addr);
 			}
 
 		} // end while loop
@@ -90,14 +143,23 @@ public class ClientImpl extends UnicastRemoteObject implements Client, Runnable 
 	}
 
 	public static void main(String[] args) {
-		String url = "rmi://localhost/Server";
-		// String url = args[0];
+		String chat_name = null;
+		String client_name = null;
+		String addr = null;
+
+		if (args.length == 3) {
+			chat_name = args[0];
+			client_name = args[1];
+			addr = args[2];
+		} else {
+			System.out.println("Error, improper amount of arguements");
+			System.exit(0);
+		}
 
 		try {
-			Server chat_server = (Server) Naming.lookup(url);
-			new Thread(new ClientImpl(chat_server)).start();
+			new Thread(new ClientImpl(chat_name, client_name, addr)).start();
 		} catch (Exception e) {
-			System.out.println("Client error encountered");
+			System.out.println("Error starting client.");
 			e.printStackTrace();
 		}
 	}

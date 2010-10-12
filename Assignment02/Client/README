@@ -1,0 +1,70 @@
+EECE 411 - Assignment #02
+=============================
+
+Authors:
+
+Name: Derek Gourlay  Student #: 66435041
+Name: Will Chang  Student#:68391069
+
+NOTE:  I realize that source should've been seperated into client / server 
+folders, but I couldnt figure out how to properly adjust our ant scripts
+to do this (my apologies I am relatively new to ant).  Class naming should
+make it fairly obvious where code is seperated though.
+
+BUILD DESCRIPTION:
+=============================
+
+To build the server and client .jar run the following
+ant target:
+
+ant jars
+
+RUNNING THE PROGRAMS
+=============================
+
+To run the server:
+java -jar server.jar <chatroom_name>
+
+The server will default to a chatroom name of "Server" if none is specified.
+
+To run the client:
+java -jar client.jar <chatroom_name> <client_name>  [rmiregistrymachine:port]
+
+
+PROGRAM Design DESCRIPTION
+=============================
+
+Push vs. Pull:
+
+Our program uses a push design.  Every client object implements a remote
+interface with a method that allows messages to be sent to it by.  When
+a client joins a server it passes a reference to itself for the server
+to send messages back by.
+
+Concurrency:
+The server maintains a list of all clients that have registered with it
+in an ArrayList.  Each time a new message is received the server launches
+a new Runnable object that will iterate through all clients in the server's
+client list in a seperate thread.  The runnable will send out the message
+received to all clients in the list except the originating party.  Once the
+entire client list has been iterated through, the thread will terminate. This
+design allows the server to scale better.  Rather than having to wait for an
+entire iteration through the client list when a message is sent (could be
+slow for large sets of clients) before the next message will be pushed to 
+clients, they can be pushed in tandem.
+
+Message format:
+The message format is simple, each client appends their client name to the
+start of every message they send to the server, and this message is propogated
+to all other clients.  We acknowledge this may not be very "secure" though,
+as clients could probably easily spoof their user name.
+
+Client Failures:
+Each time a client sends a message to the server, the server updates a timestamp
+for that client.  The server has a function run on a constant timer that after 
+every "timeout period" it will check the last time stamp associated with a client.
+If the client's timeout period has exceeded the allowable value then the client is
+removed from the server list.  
+
+Server Failures:
+Clients simply attempt to continuously recconect to the server.

@@ -1,0 +1,18 @@
+BUILD DESCRIPTION:
+=============================
+
+To build the server and client .jar run the following
+ant target:
+
+ant jars
+
+RUNNING THE PROGRAMS
+=============================
+
+To run the server:
+java -jar server.jar <chatroom_name>
+
+The server will default to a chatroom name of "Server" if none is specified.
+
+To run the client:
+java -jar client.jar <chatroom_name> <client_name>  [rmiregistrymachine:port]     
