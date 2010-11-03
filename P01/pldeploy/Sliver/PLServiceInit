@@ -1,0 +1,141 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+# -----------------------------------------------------------------
+# $Id: PLServiceInit,v 1.4 2005/02/24 18:39:42 mbowman Exp $
+#
+# Copyright (c) 2004 Intel Corporation
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+
+#     * Neither the name of the Intel Corporation nor the names of its
+#       contributors may be used to endorse or promote products derived
+#       from this software without specific prior written permission.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE INTEL OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# EXPORT LAWS: THIS LICENSE ADDS NO RESTRICTIONS TO THE EXPORT LAWS OF
+# YOUR JURISDICTION. It is licensee's responsibility to comply with any
+# export regulations applicable in licensee's jurisdiction. Under
+# CURRENT (May 2000) U.S. export regulations this software is eligible
+# for export from the U.S. and can be downloaded by or otherwise
+# exported or reexported worldwide EXCEPT to U.S. embargoed destinations
+# which include Cuba, Iraq, Libya, North Korea, Iran, Syria, Sudan,
+# Afghanistan and any other country to which the U.S. has embargoed
+# goods and services.
+
+# -----------------------------------------------------------------
+# PLServiceInit
+# Script that is run on the remote node prior to deploying new cogs.
+# The intention is that this script be used to set up the local 
+# environment.
+# -----------------------------------------------------------------
+use 5.008;
+use strict;
+use warnings;
+
+use Config;
+
+BEGIN {
+    my $home = $ENV{'HOME'};
+    my $arch = $Config{archname};
+    push(@INC,"$home/PL/lib/perl5");
+    push(@INC,"$home/PL/lib/perl5/$arch/auto");
+}
+
+# -----------------------------------------------------------------
+# Load app specific libraries
+# -----------------------------------------------------------------
+use PlanetLab::PLDeploy;
+my $gSvcCntl = PlanetLab::PLDeploy->new;
+
+# -----------------------------------------------------------------
+# INSTALL RPM's
+#
+# This little bit of code assumes that you have placed setup_yum.sh
+# (from http://www.cs.princeton.edu/~alk/setup_yum.sh) in your Sliver
+# bin directory.
+# -----------------------------------------------------------------
+my @gYumPackages = (); # list of packages to install
+my $gYumPackFile = $gSvcCntl->SliceRoot . "/lib/yumpacks";
+my $gYumInstall = $gSvcCntl->SliceRoot . "/bin/setup_yum.sh";
+if (-x $gYumInstall) {
+    $gSvcCntl->DoSystem("/usr/bin/sudo $gYumInstall") ||
+	die "Unable to install yum; $!\n";
+
+    if (-f $gYumPackFile) {
+	if (open(YP,"<$gYumPackFile")) {
+	    while (<YP>) {
+		chomp;
+		next if (/^\s*$/); # all whitespace
+		next if (/^\s*\#/); # comment
+		push(@gYumPackages,$_);
+	    }
+	    close(YP);
+	}
+    }
+
+    # now install the packages that we need
+    my @install = ();
+    foreach my $pack (@gYumPackages) {
+        my $check = `/bin/rpm -q $pack`;
+        next unless $check =~ /is not installed/;
+	push(@install,$pack);
+    }
+
+    if (@install) {
+	my $list = join(' ',@install);
+	# -t tells yum to be tolerant of errors
+	my $cmd = "/usr/bin/sudo /usr/bin/yum -t -y install $list";
+        $gSvcCntl->DoSystem($cmd) ||
+            die "Failed to install $list; $!\n";
+    }
+}
+
+# -----------------------------------------------------------------
+# SETUP rc.vinit
+#
+# This code checks for a copy of rc.vinit in the Sliver lib directory
+# and copies it to /etc/rc.vinit if the Sliver copy is newer. If the 
+# file is copied, it will invoke the "start" command.
+# -----------------------------------------------------------------
+use File::stat;
+
+my $gRCInitNew = $gSvcCntl->SliceRoot . "/lib/rc.vinit";
+my $gRCInitOld = "/etc/rc.vinit";
+if (-x $gRCInitNew) {
+    my $new = stat($gRCInitNew);
+    my $old = stat($gRCInitOld);
+    if ((! defined $old) || ($old->mtime < $new->mtime)) {
+	# for now we need to turn on crond, do it whenever we 
+	# explicitly put the rc.vinit on the machine
+	$gSvcCntl->DoSystem("/usr/bin/sudo /sbin/chkconfig crond on");
+
+	# now copy & run the new rc.vinit
+	my $cpCmd = "/bin/cp -fp $gRCInitNew $gRCInitOld";
+	$gSvcCntl->DoSystem("/usr/bin/sudo $cpCmd");
+	$gSvcCntl->DoSystem("/usr/bin/sudo /etc/rc.vinit start");
+    }
+}
