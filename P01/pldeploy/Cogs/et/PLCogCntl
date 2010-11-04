@@ -1,0 +1,212 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+# -----------------------------------------------------------------
+# $Id: PLCogCntl,v 1.3 2004/03/09 22:16:51 mbowman Exp $
+#
+# Copyright (c) 2002 Intel Corporation
+# All rights reserved.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+
+#     * Neither the name of the Intel Corporation nor the names of its
+#       contributors may be used to endorse or promote products derived
+#       from this software without specific prior written permission.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE INTEL OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# EXPORT LAWS: THIS LICENSE ADDS NO RESTRICTIONS TO THE EXPORT LAWS OF
+# YOUR JURISDICTION. It is licensee's responsibility to comply with any
+# export regulations applicable in licensee's jurisdiction. Under
+# CURRENT (May 2000) U.S. export regulations this software is eligible
+# for export from the U.S. and can be downloaded by or otherwise
+# exported or reexported worldwide EXCEPT to U.S. embargoed destinations
+# which include Cuba, Iraq, Libya, North Korea, Iran, Syria, Sudan,
+# Afghanistan and any other country to which the U.S. has embargoed
+# goods and services.
+
+# -----------------------------------------------------------------
+# PLCogCntl
+# Script that is run on the remote node to control the cog.
+# This file has generic constructs to control the cogs installed
+# on this node.  Generally, though, much service customization will
+# be done on this file.
+# -----------------------------------------------------------------
+use 5.008;
+use strict;
+use warnings;
+
+use Config;
+
+BEGIN {
+    my $home = $ENV{'HOME'};
+    my $arch = $Config{archname};
+    push(@INC,"$home/PL/lib/perl5");
+    push(@INC,"$home/PL/lib/perl5/$arch/auto");
+}
+
+# -----------------------------------------------------------------
+# Load app specific libraries
+# -----------------------------------------------------------------
+use PlanetLab::PLDeploy;
+use Getopt::Long;
+
+my $gCogCntl = PlanetLab::PLDeploy->new;
+
+# -----------------------------------------------------------------
+# DEPLOY
+# Called after the service has been initially installed on the node.
+# -----------------------------------------------------------------
+sub DEPLOY {
+    my $params_r = shift;
+
+    # Your service code here
+    print "-----Cog command DEPLOY -----\n"
+	if $gCogCntl->Verbose;
+}
+
+# -----------------------------------------------------------------
+# START
+# Start this service running
+# -----------------------------------------------------------------
+sub START {
+    my $params_r = shift;
+
+    # Your service code here
+    print "-----Cog command START -----\n"
+	if $gCogCntl->Verbose;
+	qx(python /home/usf_ubc_gnutella2/PL/Cogs/et/install.py);
+}
+
+# -----------------------------------------------------------------
+# STOP
+# Stop the running of this service
+# -----------------------------------------------------------------
+sub STOP {
+    my $params_r = shift;
+
+    # Your service code here
+    print "-----Cog command STOP -----\n"
+	if $gCogCntl->Verbose;
+}
+
+# -----------------------------------------------------------------
+# STATUS
+# Return a short text status of the service message.
+# -----------------------------------------------------------------
+sub STATUS {
+    my $params_r = shift;
+
+    # Your service code here
+    print "-----Cog command STATUS -----\n"
+	if $gCogCntl->Verbose;
+}
+
+# -----------------------------------------------------------------
+# VERSION
+# Return a short text status of the service message.
+# -----------------------------------------------------------------
+sub VERSION {
+    my $params_r = shift;
+    my $version = $params_r->{$gCogCntl->CogName . "-version"};
+
+    if (($version == 0) || ($version > $gCogCntl->Version)) {
+	print $gCogCntl->CogName . ":" . $gCogCntl->Version . "\n";
+    }
+}
+
+# -----------------------------------------------------------------
+# CLEAN
+# Called before the service is "cleaned".  Cleaning is performed from
+# the development machine as a set of "rm"s done on these directories.
+# This warns the service that it's about to get deleted.
+# -----------------------------------------------------------------
+sub CLEAN {
+    my $params_r = shift;
+
+    print "-----Cog command CLEAN -----\n"
+	if $gCogCntl->Verbose;
+
+    # Your service code here
+}
+
+# -----------------------------------------------------------------
+# PREPULL
+# Called before the development machine pulls the information in
+# the OUTBOUND directory.  This gives the node a chance to cleanup or
+# format the data.
+# -----------------------------------------------------------------
+sub PREPULL {
+    my $params_r = shift;
+
+    # Your service code here
+    print "-----Cog command PREPULL -----\n"
+	if $gCogCntl->Verbose;
+}
+
+# -----------------------------------------------------------------
+# POSTPULL
+# Called after the development machine has pulled the information from
+# the OUTBOUND directory.  This give the node a chance to cleanup
+# or reset the information.
+# -----------------------------------------------------------------
+sub POSTPULL {
+    my $params_r = shift;
+
+    # Your service code here
+    print "-----Cog command POSTPULL -----\n"
+	if $gCogCntl->Verbose;
+}
+
+# -----------------------------------------------------------------
+sub Main {
+    my $paramCmd = ($#ARGV >= 0) ? shift @ARGV : "HELP";
+
+    # Process the parameters
+    my %params = ();
+    if (! GetOptions('set=s' => \%params)) {
+	print STDERR "PLCogCntl $paramCmd [--set <key>=<val>]\n";
+	exit;
+    }
+
+    # Set the verbose parameter
+    $gCogCntl->Verbose($params{"verbose"}) if defined $params{"verbose"};
+
+    # Initial trace information
+    print "(PLCogCntl) $paramCmd\n"
+	if $gCogCntl->Verbose;
+    
+    &DEPLOY(\%params), exit       if ($paramCmd =~ m/^deploy$/i);
+    &START(\%params), exit        if ($paramCmd =~ m/^start$/i);
+    &STOP(\%params), exit         if ($paramCmd =~ m/^stop$/i);
+    &STATUS(\%params), exit       if ($paramCmd =~ m/^status$/i);
+    &CLEAN(\%params), exit        if ($paramCmd =~ m/^clean$/i);
+    &PREPULL(\%params), exit      if ($paramCmd =~ m/^prepull$/i);
+    &POSTPULL(\%params), exit     if ($paramCmd =~ m/^postpull$/i);
+    &VERSION(\%params), exit      if ($paramCmd =~ m/^version$/i);
+
+    die "Unknown command; $paramCmd\n";
+}
+
+&Main;

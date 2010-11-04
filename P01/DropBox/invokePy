@@ -1,0 +1,4 @@
+#!/bin/bash
+ssh usf_ubc_gnutella2@pl-node-0.csl.sri.com
+ssh usf_ubc_gnutella2@pl-node-0.csl.sri.com 'cd P01'
+ssh usf_ubc_gnutella2@pl-node-0.csl.sri.com 'python node.py'

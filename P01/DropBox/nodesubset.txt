@@ -1,0 +1,3 @@
+pl1.rcc.uottawa.ca
+pl2.csl.utoronto.ca
+pl1.csl.utoronto.ca

@@ -1,0 +1,21 @@
+NODE="allSorted.txt"
+NEWNODE="newList"
+FAILNODE="failList"
+WAIT=5
+COUNT=3
+PROG=0
+
+rm $NEWNODE
+rm $FAILNODE
+while read line
+do
+  TMP=$line
+  CNT=$(ping -c $COUNT -W $WAIT $TMP | grep 'received' | awk -F',' '{ print $2 }' | awk '{ print $1 }')
+  if [ $CNT -ge 1 ]; then
+    echo $TMP >> $NEWNODE
+  else
+    echo $TMP >> $FAILNODE
+  fi
+  echo -e -n $PROG "\015" 
+  let "PROG += 1"
+done <$NODE

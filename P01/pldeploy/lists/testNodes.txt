@@ -1,0 +1,11 @@
+plab1.create-net.org
+dplanet1.uoc.edu
+pl2.eecs.utk.edu
+dplanet2.uoc.edu
+planet2.elte.hu
+planet02.csc.ncsu.edu
+planet1.ku.edu.tr
+planetlab-3.cmcl.cs.cmu.edu
+planetlab-4.ece.iastate.edu
+planet03.csc.ncsu.edu
+planetlab02.cs.washington.edu
