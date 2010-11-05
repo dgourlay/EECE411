@@ -1,6 +1,6 @@
 import elementtree.ElementTree as ET
 
-XML_FILE = "output/status.xml"
+XML_FILE = "/home/usf_ubc_gnutella2/deploy/mon/output/status.xml"
 
 # indices of entry; this should correspond with map.updateOwnStatus()
 CLOCK		= 0

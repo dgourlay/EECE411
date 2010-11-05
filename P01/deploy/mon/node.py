@@ -16,7 +16,7 @@ import xml # custom scripts
 import map
 
 # constants
-PORT = 5011
+PORT = 4011
 CONNECT_TIMEOUT = 10
 MIN_SLEEP_TIME = 5
 MAX_SLEEP_TIME = 10
