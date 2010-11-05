@@ -1,3 +1,12 @@
+cs-planetlab3.cs.surrey.sfu.ca
+cs-planetlab4.cs.surrey.sfu.ca
+deimos.cecalc.ula.ve
+fobos.cecalc.ula.ve
+pl1.csl.utoronto.ca
+pl1.rcc.uottawa.ca
+pl2.csl.utoronto.ca
+pl2.rcc.uottawa.ca
+pl3.planetlab.uvic.ca
 planetlab-1.calpoly-netlab.net
 planetlab-1.elisa.cpsc.ucalgary.ca
 planetlab-1.usask.ca

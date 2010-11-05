@@ -1,11 +1,18 @@
 #! /usr/bin/env python
-import subprocess
+import os
 
-login = 'usf_ubc_gnutella2'
-tarName = 'jre.tar.gz'
-cogPath = '/home/'+login+'/PL/Cogs/cog01/'
-# extract JRE
-subprocess.Popen([r"wget", "-N", "http://www.ece.ubc.ca/~samera/TA/411/project/jre.tar.gz"]).wait()
-subprocess.Popen([r"tar", "xvzf", tarName]).wait()
-subprocess.Popen([r"mv", cogPath+'bash_profile', "/home/"+login+"/.bash_profile"]).wait()
+bp = "~/deploy/java/bash_profile"
+
+# setup dloads directory JRE
+os.system("mkdir ~/downloads")
+os.chdir("~/downloads")
+#download and extract jre tarball
+os.system("wget -N http://www.ece.ubc.ca/~samera/TA/411/project/jre.tar.gz" )
+os.system("tar xvzf jre.tar.gz")       
+os.system("mkdir ~/Programs/")
+os.system("mv jre1.6.0_16/ ~/Programs/")
+os.chdir("~/")
+
+#setup .bash_profile to have the correct path
+os.system("mv "+bp+" ~/.bash_profile")
 
