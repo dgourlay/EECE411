@@ -1,0 +1,7 @@
+planetlab-1.calpoly-netlab.net
+planetlab-1.elisa.cpsc.ucalgary.ca
+planetlab-1.usask.ca
+planetlab-2.calpoly-netlab.net
+planetlab-2.elisa.cpsc.ucalgary.ca
+planetlab01.erin.utoronto.ca
+planetlab02.erin.utoronto.ca

@@ -1,0 +1,59 @@
+<html>
+<body>
+
+<script type="text/javascript">
+if (window.XMLHttpRequest)
+  {// code for IE7+, Firefox, Chrome, Opera, Safari
+  xmlhttp=new XMLHttpRequest();
+  }
+else
+  {// code for IE6, IE5
+  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+xmlhttp.open("GET","sample.xml",false);
+xmlhttp.send();
+xmlDoc=xmlhttp.responseXML; 
+
+document.write("<table border='1'>");
+document.write("<tr><td rowspan=\"2\" align=\"CENTER\">Name</td>");
+document.write("<td rowspan=\"2\" align=\"CENTER\">Status</td>");
+document.write("<td rowspan=\"2\" align=\"CENTER\">Clock</td>");
+document.write("<td colspan=\"3\" align=\"CENTER\">Memory</td>");
+document.write("<td colspan=\"2\" align=\"CENTER\">Time</td>");
+document.write("<td colspan=\"3\" align=\"CENTER\">CPU</td></tr>");
+document.write("<tr><td>Mem Cap</td><td>Mem Available</td><td>Mem Used</td>");
+document.write("<td>Up Time</td><td>System Time</td>");
+document.write("<td>CPU1</td><td>CPU5</td><td>CPU15</td></tr>");
+var x=xmlDoc.getElementsByTagName("node");
+for (i=0;i<x.length;i++)
+  { 
+  document.write("<tr><td>");
+  document.write(x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("status")[0].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("clock")[0].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("memory")[0].childNodes[0].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("memory")[0].childNodes[1].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("memory")[0].childNodes[2].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("time")[0].childNodes[0].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("time")[0].childNodes[1].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("cpu")[0].childNodes[0].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("cpu")[0].childNodes[1].childNodes[0].nodeValue);
+  document.write("</td><td>");
+  document.write(x[i].getElementsByTagName("cpu")[0].childNodes[2].childNodes[0].nodeValue);
+  document.write("</td></tr>");
+  }
+document.write("</table>");
+
+</script>
+
+</body>
+</html>
