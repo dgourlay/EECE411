@@ -45,6 +45,7 @@ def dumpToXML(map):
 		entry = map[n]
 		if entry[DEAD_FLAG] == 0:
 			nodeStatus.text = "Alive"
+			
 			clock.text = str(entry[CLOCK])
 			
 			memCap.text = entry[CAPACITY]

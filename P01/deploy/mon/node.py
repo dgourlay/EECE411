@@ -16,14 +16,14 @@ import xml # custom scripts
 import map
 
 # constants
-PORT = 4011
+PORT = 5011
 CONNECT_TIMEOUT = 10
 MIN_SLEEP_TIME = 5
 MAX_SLEEP_TIME = 10
 EOF = "EOF"
 BUSY_SIGNAL = "=SERVRBUSY="
 CLIENT_RPLY = "=RECEIVED="
-CLK_FILE = "output/clock"
+CLK_FILE = "/home/usf_ubc_gnutella2/deploy/mon/output/clock"
 NODE_FILE = "/home/usf_ubc_gnutella2/deploy/mon/nodes.txt"
 
 # global vars
